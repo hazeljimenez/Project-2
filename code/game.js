@@ -22,7 +22,7 @@ function Level(plan) {
   for (var y = 0; y < this.height; y++) {
     var line = plan[y], gridLine = [];
 
-    // Loop through each array element in the inner array for the type of the tile
+   // Loop through each array element in the inner array for the type of the tile
     for (var x = 0; x < this.width; x++) {
       // Get the type from that character in the string. It can be 'x', '!' or ' '
       // If the character is ' ', assign null.
@@ -38,6 +38,9 @@ function Level(plan) {
       // Because there is a third case (space ' '), use an "else if" instead of "else"
       else if (ch == "!")
         fieldType = "lava";
+	   else if (ch == "^")
+        fieldType = "spike";
+		
 
       // "Push" the fieldType, which is a string, onto the gridLine array (at the end).
       gridLine.push(fieldType);
@@ -70,7 +73,6 @@ Vector.prototype.plus = function(other) {
 Vector.prototype.times = function(factor) {
   return new Vector(this.x * factor, this.y * factor);
 };
-
 
 // A Player has a size, speed and position.
 function Player(pos) {
@@ -358,8 +360,8 @@ Player.prototype.act = function(step, level, keys) {
 
   // Losing animation
   if (level.status == "lost") {
-    this.pos.y += step;
-    this.size.y -= step;
+    this.pos.y -= step;
+    this.size.y = -.3;
   }
 };
 
@@ -374,6 +376,10 @@ Level.prototype.playerTouched = function(type, actor) {
     this.actors = this.actors.filter(function(other) {
       return other != actor;
     });
+	if (type =="spike" && this.status == null) {
+		this.status = "lost";
+		this.finishDelay = 1;
+	}
     // If there aren't any coins left, player wins
     if (!this.actors.some(function(actor) {
            return actor.type == "coin";
